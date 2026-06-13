@@ -68,12 +68,13 @@ LOGO_R = 34.0          # Radius des Emblems
 INLAY_H = 0.8          # Tiefe/Hoehe des Inlays (= 4 Lagen bei 0.2 mm)
 RING_W = 3.5           # Breite des schwarzen Aussenrings
 FONT = "DejaVu Sans"
-TXT_TOP = "BVB"        # grosser Schriftzug
 TXT_BOT = "09"         # kleiner Schriftzug
-FS_TOP = 24.0          # Schriftgroesse "BVB"
+FS_TOP = 24.0          # Schriftgroesse "B" / "V" / "B"
 FS_BOT = 13.0          # Schriftgroesse "09"
-TXT_TOP_Y = 5.0        # vertikale Lage "BVB"
+TXT_TOP_Y = 4.0        # vertikale Lage der beiden "B"
 TXT_BOT_Y = -15.0      # vertikale Lage "09"
+LETTER_DX = 13.5       # horizontaler Abstand der "B" von der Mitte
+V_RISE = 12.0          # das mittlere "V" nach oben versetzt (~50% Zeilenhoehe)
 
 OUT_DIR = Path(__file__).resolve().parent.parent / "output"
 
@@ -108,10 +109,16 @@ def _logo_fg_sketch():
         # Aussenring
         Circle(LOGO_R)
         Circle(LOGO_R - RING_W, mode=Mode.SUBTRACT)
-        # Schrift
-        with Locations((0, TXT_TOP_Y)):
-            Text(TXT_TOP, font_size=FS_TOP, font=FONT, font_style=FontStyle.BOLD,
-                 align=(Align.CENTER, Align.CENTER))
+        # Schriftzug "B V B" -- das mittlere V ist nach oben versetzt
+        # (wie im echten BVB-Emblem)
+        bold = dict(font=FONT, font_style=FontStyle.BOLD,
+                    align=(Align.CENTER, Align.CENTER))
+        with Locations((-LETTER_DX, TXT_TOP_Y)):
+            Text("B", font_size=FS_TOP, **bold)
+        with Locations((0, TXT_TOP_Y + V_RISE)):
+            Text("V", font_size=FS_TOP, **bold)
+        with Locations((LETTER_DX, TXT_TOP_Y)):
+            Text("B", font_size=FS_TOP, **bold)
         with Locations((0, TXT_BOT_Y)):
             Text(TXT_BOT, font_size=FS_BOT, font=FONT, font_style=FontStyle.BOLD,
                  align=(Align.CENTER, Align.CENTER))
