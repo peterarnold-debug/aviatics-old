@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Hinweis: der Ordner output/ mit den STL/STEP-Dateien wird BEWUSST
+# eingecheckt, damit man die druckfertigen Dateien direkt laden kann.

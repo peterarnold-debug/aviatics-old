@@ -1,0 +1,4 @@
+# 3D-Modellierung der Butterbrotdose
+# Installation:  pip install -r requirements.txt
+build123d>=0.10.0   # parametrisches CAD (B-Rep ueber OpenCascade/OCP)
+trimesh>=4.0        # Mesh-Pruefung / Verifikation der exportierten STL
