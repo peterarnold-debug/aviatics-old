@@ -4,7 +4,12 @@ Parametrisches 3D-Modell einer **Schüler-Brotdose** (für 1–2 belegte Brote +
 etwas Obst) mit stilisiertem **„BVB 09"-Emblem** auf dem Deckel – ausgelegt für
 den **Bambu Lab A1 Mini** (Bauraum 180 × 180 × 180 mm).
 
-![Logo-Vorschau](output/logo_preview.png)
+| Draufsicht Deckel | Explosionsansicht | Logo |
+|---|---|---|
+| ![Deckel von oben](output/render_top.png) | ![Explosionsansicht](output/render_exploded.png) | ![Logo](output/logo_preview.png) |
+
+> Die 3D-Bilder sind einfache matplotlib-Vorschauen (kein Foto-Render); die
+> tatsächliche Druckqualität ist deutlich sauberer.
 
 ## Was wird erzeugt?
 
@@ -40,6 +45,9 @@ Die STL-Dateien sind bereits **druckfertig orientiert**:
   Das Logo liegt damit auf der **bettzugewandten Seite** → wird besonders glatt.
 - Beide Teile sind ~170 mm lang. Das ist nah am Limit des A1 Mini (180 mm) –
   am besten **diagonal auf der Platte** platzieren, damit ein Brim noch passt.
+- Das Logo ist im Modell **horizontal vorgespiegelt**, weil es auf der
+  bettzugewandten Deckelseite gedruckt wird – nach dem Wenden des fertigen
+  Deckels liest es sich seitenrichtig.
 
 ### Empfohlene Slicer-Einstellungen (Bambu Studio / Orca)
 - Schichthöhe **0,2 mm**

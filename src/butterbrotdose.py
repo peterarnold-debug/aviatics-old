@@ -42,6 +42,7 @@ from build123d import (
     export_step,
     export_stl,
     extrude,
+    mirror,
     offset,
 )
 
@@ -114,6 +115,10 @@ def _logo_fg_sketch():
         with Locations((0, TXT_BOT_Y)):
             Text(TXT_BOT, font_size=FS_BOT, font=FONT, font_style=FontStyle.BOLD,
                  align=(Align.CENTER, Align.CENTER))
+        # Das Logo sitzt auf der beim Druck UNTEN liegenden Deckelflaeche.
+        # Damit es nach dem Wenden des Deckels seitenrichtig lesbar ist, wird
+        # es hier horizontal gespiegelt (x -> -x).
+        mirror(about=Plane.YZ, mode=Mode.REPLACE)
     return fg.sketch
 
 
