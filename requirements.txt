@@ -1,0 +1,12 @@
+# --- Butterbrotdose (src/butterbrotdose.py) ---
+build123d>=0.10.0     # parametrisches CAD (B-Rep ueber OpenCascade/OCP)
+trimesh>=4.0          # Mesh-Pruefung / Extrusion / Verifikation
+
+# --- Wings-Academy-Logo (src/wings_logo.py) ---
+# Zusaetzlich noetig: ghostscript (System-Paket, z.B. apt-get install ghostscript)
+pillow>=10.0          # EPS-Render laden
+opencv-python-headless>=4.8   # Konturen aus den Farbmasken
+shapely>=2.0          # 2D-Polygone (Loecher, Vereinigung, Stege)
+scipy>=1.10           # minimaler Spannbaum fuer die Verbindungsstege
+mapbox_earcut>=1.0    # Triangulierung fuer die Extrusion
+numpy>=1.24
