@@ -91,3 +91,39 @@ drücken**, bis sie hörbar einrasten. Vorne den Verschluss zudrücken.
 Das „BVB 09"-Emblem ist hier **stilisiert nachempfunden** und nur für den
 **privaten Gebrauch** gedacht. Das offizielle Logo ist eine eingetragene Marke
 von Borussia Dortmund – kein Verkauf oder Vertrieb der Drucke.
+
+---
+
+# Wings-Academy-Logo (mehrfarbig, 3D)
+
+Separates Projekt: Das Vektor-Logo aus `assets/wingsacademy_logo.eps` wird als
+**dreifarbiges 3D-Relief** aufbereitet – je Farbe (schwarz / blau / rot) ein
+eigenes STL für den Mehrfarbdruck.
+
+![Logo Draufsicht](output/wings_logo_preview.png)
+
+- Generator: [`src/wings_logo.py`](src/wings_logo.py)
+  (EPS → Ghostscript-Render → Farbmasken → Konturen → Extrusion).
+- Größe ~**142 × 24 mm**, Dicke **3 mm** (Parameter `TARGET_WIDTH_MM`,
+  `THICKNESS_MM`).
+- Teile: `output/wings_logo_black.stl`, `_blue.stl`, `_red.stl`.
+- **Verbindungsstege** (`BRIDGE_W`, Standard 1,6 mm) verbinden alle Einzel-
+  buchstaben über einen minimalen Spannbaum zu **einem** zusammenhängenden
+  Objekt (geprüft: Gesamt-Vereinigung = 1 Teil). Ohne diese Stege zerfiele das
+  Schrift-Logo in ~30 lose Teile.
+
+**Erzeugen:**
+```bash
+sudo apt-get install -y ghostscript        # zum Rendern des EPS
+pip install -r requirements.txt
+python src/wings_logo.py
+```
+
+**Drucken (A1 Mini):** Die drei STL in Bambu Studio importieren →
+**„Assemble"** → Filamente Schwarz/Blau/Rot zuweisen. Liegt flach, keine
+Stützen. Die feinen Striche von „powered by AVIATICS" sind bei 142 mm Breite
+teils <1 mm – bei Problemen `TARGET_WIDTH_MM` erhöhen (bis ~178 mm) oder die
+Zeile separat vergrößern.
+
+> Hinweis: Das Wings-Academy-/AVIATICS-Logo ist Eigentum des Nutzers
+> (aviatics.de) und wurde zur 3D-Umsetzung bereitgestellt.

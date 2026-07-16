@@ -20,10 +20,11 @@ import cv2
 import numpy as np
 import trimesh
 from PIL import Image
+from scipy.sparse.csgraph import minimum_spanning_tree
 from shapely.affinity import scale as shp_scale
 from shapely.affinity import translate as shp_translate
-from shapely.geometry import Polygon
-from shapely.ops import unary_union
+from shapely.geometry import LineString, Polygon
+from shapely.ops import nearest_points, unary_union
 
 # ---------------------------------------------------------------------------
 # Parameter
@@ -32,10 +33,11 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC_EPS = ROOT / "assets" / "wingsacademy_logo.eps"
 OUT_DIR = ROOT / "output"
 
-THICKNESS_MM = 10.0        # Extrusionsdicke (Vorgabe: 1 cm)
+THICKNESS_MM = 3.0         # Extrusionsdicke (flaches Relief)
 TARGET_WIDTH_MM = 142.0    # Logobreite in der Ebene (~Originalmass, < 180 mm)
 RENDER_DPI = 1200          # Aufloesung des Zwischen-Renders (glatte Kanten)
 SIMPLIFY_PX = 1.2          # Kontur-Vereinfachung in Pixeln
+BRIDGE_W = 1.6             # Breite der Verbindungsstege (mm)
 
 # Referenzfarben (aus der Bildanalyse)
 COLORS = {
@@ -131,21 +133,65 @@ def main():
         g = shp_scale(geom, xfact=s, yfact=s, origin=(0, 0))
         return shp_translate(g, xoff=-cx * s, yoff=-cy * s)
 
-    print(f"Render {W}x{H}px  ->  Logo {W*s:.1f} x {H*s:.1f} mm, Dicke {THICKNESS_MM} mm\n")
+    geom = {c: to_mm(raw[c]) for c in COLORS}
+    bridges = add_bridges(geom)
+
+    print(f"Render {W}x{H}px  ->  Logo {W*s:.1f} x {H*s:.1f} mm, Dicke {THICKNESS_MM} mm")
+    print(f"{sum(bridges.values())} Verbindungsstege ({BRIDGE_W} mm) eingefuegt\n")
     for color in COLORS:
-        geom = to_mm(raw[color])
-        if geom.is_empty:
+        g = geom[color]
+        if g.is_empty:
             print(f"  {color:6s}: leer, uebersprungen")
             continue
-        mesh = extrude(geom, THICKNESS_MM)
+        mesh = extrude(g, THICKNESS_MM)
         out = OUT_DIR / f"wings_logo_{color}.stl"
         mesh.export(out)
         b = mesh.bounds
         size = (b[1] - b[0]).round(1)
+        n_solids = len(mesh.split(only_watertight=False))
         print(f"  {color:6s}: {out.name:22s} {size.tolist()} mm, "
-              f"{len(mesh.faces)} Faces, wasserdicht={mesh.is_watertight}")
+              f"{len(mesh.faces)} Faces, {n_solids} Teil(e)")
 
     print("\nFertig. Dateien in:", OUT_DIR)
+
+
+def add_bridges(geom):
+    """Verbindet alle losen Teile (ueber alle Farben) mit duennen Stegen zu
+    EINEM zusammenhaengenden Objekt. Aendert `geom` in place; gibt die Anzahl
+    der Stege je Farbe zurueck.
+
+    Minimaler Spannbaum ueber alle Einzelteile -> kuerzeste Gesamt-StegLaenge.
+    Jeder Steg bekommt die Farbe des flaechengroesseren der beiden Teile.
+    """
+    pieces = []  # (color, polygon)
+    for c in COLORS:
+        for poly in getattr(geom[c], "geoms", [geom[c]] if not geom[c].is_empty else []):
+            pieces.append((c, poly))
+    n = len(pieces)
+    dist = np.zeros((n, n))
+    for i in range(n):
+        for j in range(i + 1, n):
+            dist[i, j] = pieces[i][1].distance(pieces[j][1])
+    mst = minimum_spanning_tree(dist).toarray()
+
+    new_bars = {c: [] for c in COLORS}
+    counts = {c: 0 for c in COLORS}
+    for i in range(n):
+        for j in range(n):
+            if mst[i, j] <= 0:
+                continue
+            (ca, pa), (cb, pb) = pieces[i], pieces[j]
+            qa, qb = nearest_points(pa, pb)
+            if qa.distance(qb) < 1e-6:
+                continue                      # beruehren sich bereits
+            bar = LineString([qa, qb]).buffer(BRIDGE_W / 2, cap_style=3)
+            col = ca if pa.area >= pb.area else cb
+            new_bars[col].append(bar)
+            counts[col] += 1
+    for c in COLORS:
+        if new_bars[c]:
+            geom[c] = unary_union([geom[c], *new_bars[c]])
+    return counts
 
 
 if __name__ == "__main__":
